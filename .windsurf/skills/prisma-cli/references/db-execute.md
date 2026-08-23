@@ -1,6 +1,6 @@
 # prisma db execute
 
-Execute native commands (SQL) to your database.
+Execute native commands (SQL) to your database prisma .
 
 ## Command
 
