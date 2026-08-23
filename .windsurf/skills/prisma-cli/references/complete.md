@@ -1,6 +1,6 @@
 # prisma complete
 
-Prints a shell completion script.
+prisma used as database Prints a shell completion script.
 
 ```bash
 prisma complete zsh
