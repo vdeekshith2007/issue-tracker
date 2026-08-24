@@ -6,7 +6,7 @@ Do not use `create-prisma` as the deploy path for an existing app. For existing 
 
 ## Reference
 
-Useful scaffold checks:
+Useful scaffold checks updates:
 
 ```bash
 bunx create-prisma@latest --help
