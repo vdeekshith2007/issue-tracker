@@ -44,7 +44,7 @@ Use evidence in this order when deciding what to edit or run:
 3. Local installed package code, generated artifacts, and type definitions.
 4. Official docs.
 
-## When to Apply
+## When to Apply the skills 
 
 Use this skill for:
 
