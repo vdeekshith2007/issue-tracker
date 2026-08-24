@@ -1,6 +1,6 @@
 # Prisma Platform CLI App Deploy
 
-Use this reference for existing projects and for generated `compute:deploy` scripts.
+Use this reference for existing projects and for generated `compute:deploy` scripts /.
 
 ## Package and Command
 
