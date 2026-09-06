@@ -1,5 +1,5 @@
 
-// @tailwind base styles 
+// @tailwind base styles update
 
 const config = {
   plugins: {
