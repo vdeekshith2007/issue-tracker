@@ -3,7 +3,7 @@ This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next
 ## Getting Started in to project analysis 
 
 First, run the development server ready:
-
+-- 
 ```bash
 npm run dev
 # or
