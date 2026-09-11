@@ -1,7 +1,7 @@
 # prisma migrate status
 
 Checks the status of your database migrations.
-
+   
 ## Command
 
 ```bash
