@@ -1,4 +1,4 @@
-# prisma db seed
+# prisma db seed  
 
 Runs your database seed script to populate data.
 
