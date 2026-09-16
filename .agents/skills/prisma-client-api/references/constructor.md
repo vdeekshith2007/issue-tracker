@@ -1,5 +1,5 @@
 # PrismaClient Constructor
-
+    
 Configure Prisma Client when instantiating.
 
 ## Basic Instantiation
