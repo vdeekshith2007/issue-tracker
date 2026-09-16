@@ -13,4 +13,4 @@ const QueryClientProvider = ({ children }: PropsWithChildren) => {
   )
 }
 
-export default QueryClientProvider
+export default QueryClientProvider     
