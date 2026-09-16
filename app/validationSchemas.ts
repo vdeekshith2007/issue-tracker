@@ -15,7 +15,7 @@ export const patchIssueSchema = z.object({
     .max(255)
     .optional(),
   description: z
-    .string()
+    .string()    
     .min(1, "Description is required.")
     .max(65535)
     .optional(),
