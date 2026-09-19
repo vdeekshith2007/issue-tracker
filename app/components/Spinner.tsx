@@ -10,7 +10,7 @@ const Spinner = () => {
         Loading...
       </span>
     </div>
-  );  
+  );    
 };
 
 export default Spinner;
