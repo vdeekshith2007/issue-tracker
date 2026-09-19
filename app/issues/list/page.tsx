@@ -7,7 +7,7 @@ import { Flex } from '@radix-ui/themes';
 import { Metadata } from 'next';
 
 interface Props {
-  searchParams: IssueQuery
+  searchParams: IssueQuery  
 }
 
 const IssuesPage = async ({ searchParams }: Props) => {
