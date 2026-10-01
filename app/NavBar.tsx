@@ -18,7 +18,7 @@ const NavBar = () => {
     <nav className="bg-white border-b">
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         
-        {/* Logo */}
+        {/* Logo */}  
         <Link
           href="/"
           className="flex items-center gap-2 text-black font-semibold text-lg"
