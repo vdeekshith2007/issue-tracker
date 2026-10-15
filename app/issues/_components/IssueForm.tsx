@@ -92,8 +92,12 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           <Controller
             name="description"
             control={control}
-            render={({ field }) => (
-              <SimpleMDE placeholder="Detailed issue description and reproduction steps..." {...field} />
+            render={({ field: { onChange, value } }) => (
+              <SimpleMDE
+                placeholder="Detailed issue description and reproduction steps..."
+                value={value}
+                onChange={onChange}
+              />
             )}
           />
           <ErrorMessage>{errors.description?.message}</ErrorMessage>
