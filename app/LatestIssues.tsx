@@ -1,7 +1,7 @@
 import prisma from '@/prisma/client';
 import { Avatar, Card, Flex, Heading, Table, Text } from '@radix-ui/themes';
 import React from 'react';
-import { IssueStatusBadge } from './components';
+import { IssuePriorityBadge, IssueStatusBadge } from './components';
 import Link from 'next/link';
 
 const LatestIssues = async () => {
@@ -10,7 +10,7 @@ const LatestIssues = async () => {
   try {
     issues = await prisma.issue.findMany({
       orderBy: { createdAt: 'desc' },
-      take: 5,
+      take: 6,
       include: {
         assignedToUser: true,
       },
@@ -34,14 +34,17 @@ const LatestIssues = async () => {
         <Table.Root>
           <Table.Body>
             {issues.map((issue) => (
-              <Table.Row key={issue.id}>
+              <Table.Row key={issue.id} className="hover:bg-slate-50 transition-colors">
                 <Table.Cell>
-                  <Flex justify="between">
+                  <Flex justify="between" align="center">
                     <Flex direction="column" align="start" gap="2">
-                      <Link href={`/issues/${issue.id}`} className="font-medium hover:underline">
+                      <Link href={`/issues/${issue.id}`} className="font-medium hover:underline text-violet-700">
                         {issue.title}
                       </Link>
-                      <IssueStatusBadge status={issue.status} />
+                      <Flex gap="2" align="center">
+                        <IssueStatusBadge status={issue.status} />
+                        <IssuePriorityBadge priority={issue.priority} />
+                      </Flex>
                     </Flex>
                     {issue.assignedToUser && (
                       <Avatar

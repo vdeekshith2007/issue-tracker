@@ -1,6 +1,6 @@
 import Pagination from "@/app/components/Pagination";
 import prisma from "@/prisma/client";
-import { Status } from "@prisma/client";
+import { Priority, Status } from "@prisma/client";
 import IssueActions from "./IssueActions";
 import IssueTable, { IssueQuery, columnNames } from "./IssueTable";
 import { Callout, Flex } from "@radix-ui/themes";
@@ -13,11 +13,22 @@ interface Props {
 const IssuesPage = async ({ searchParams }: Props) => {
   const resolvedSearchParams = await searchParams;
   const statuses = Object.values(Status);
+  const priorities = Object.values(Priority);
+
   const status =
     resolvedSearchParams?.status && statuses.includes(resolvedSearchParams.status)
       ? resolvedSearchParams.status
       : undefined;
-  const where = { status };
+
+  const priority =
+    resolvedSearchParams?.priority && priorities.includes(resolvedSearchParams.priority)
+      ? resolvedSearchParams.priority
+      : undefined;
+
+  const where = {
+    ...(status && { status }),
+    ...(priority && { priority }),
+  };
 
   const orderBy =
     resolvedSearchParams?.orderBy && columnNames.includes(resolvedSearchParams.orderBy)
@@ -35,7 +46,7 @@ const IssuesPage = async ({ searchParams }: Props) => {
     [issues, issueCount] = await Promise.all([
       prisma.issue.findMany({
         where,
-        orderBy,
+        orderBy: orderBy || { createdAt: "desc" },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
@@ -47,7 +58,7 @@ const IssuesPage = async ({ searchParams }: Props) => {
   }
 
   return (
-    <Flex direction="column" gap="3">
+    <Flex direction="column" gap="4">
       {dbError && (
         <Callout.Root color="red">
           <Callout.Text>⚠ {dbError}</Callout.Text>
@@ -68,7 +79,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Issue Tracker Pro - Issue List",
-  description: "View and filter all project issues",
+  description: "View and filter all project issues by status and priority",
 };
 
 export default IssuesPage;

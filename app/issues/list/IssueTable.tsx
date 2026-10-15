@@ -1,13 +1,14 @@
-import { IssueStatusBadge } from "@/app/components";
+import { IssuePriorityBadge, IssueStatusBadge } from "@/app/components";
 import { ArrowUpIcon } from "@radix-ui/react-icons";
 import { Table } from "@radix-ui/themes";
 import Link from "next/link";
 import React from "react";
 import NextLink from "next/link";
-import { Issue, Status } from "@prisma/client";
+import { Issue, Priority, Status } from "@prisma/client";
 
 export interface IssueQuery {
   status?: Status;
+  priority?: Priority;
   orderBy?: keyof Issue;
   page?: string;
 }
@@ -32,6 +33,7 @@ const IssueTable = ({ searchParams, issues }: Props) => {
                   pathname: "/issues/list",
                   query: {
                     ...(searchParams.status && { status: searchParams.status }),
+                    ...(searchParams.priority && { priority: searchParams.priority }),
                     orderBy: column.value,
                   },
                 }}
@@ -47,20 +49,27 @@ const IssueTable = ({ searchParams, issues }: Props) => {
       </Table.Header>
       <Table.Body>
         {issues.map((issue) => (
-          <Table.Row key={issue.id}>
+          <Table.Row key={issue.id} className="hover:bg-slate-50 transition-colors">
             <Table.Cell>
-              <Link href={`/issues/${issue.id}`} className="font-medium hover:underline text-violet-700">
+              <Link
+                href={`/issues/${issue.id}`}
+                className="font-medium hover:underline text-violet-700"
+              >
                 {issue.title}
               </Link>
-              <div className="block md:hidden mt-1">
+              <div className="flex items-center gap-2 md:hidden mt-2">
                 <IssueStatusBadge status={issue.status} />
+                <IssuePriorityBadge priority={issue.priority} />
               </div>
             </Table.Cell>
             <Table.Cell className="hidden md:table-cell">
               <IssueStatusBadge status={issue.status} />
             </Table.Cell>
+            <Table.Cell className="hidden md:table-cell">
+              <IssuePriorityBadge priority={issue.priority} />
+            </Table.Cell>
             <Table.Cell className="hidden md:table-cell text-zinc-500">
-              {new Date(issue.createdAt).toDateString()}
+              {new Date(issue.createdAt).toLocaleDateString()}
             </Table.Cell>
           </Table.Row>
         ))}
@@ -78,6 +87,11 @@ const columns: {
   {
     label: "Status",
     value: "status",
+    className: "hidden md:table-cell",
+  },
+  {
+    label: "Priority",
+    value: "priority",
     className: "hidden md:table-cell",
   },
   {

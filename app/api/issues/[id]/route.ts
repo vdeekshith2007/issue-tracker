@@ -23,7 +23,7 @@ export async function PATCH(
       status: 400,
     });
 
-  const { assignedToUserId, title, description, status } = body;
+  const { assignedToUserId, title, description, status, priority } = body;
 
   if (assignedToUserId) {
     const user = await prisma.user.findUnique({
@@ -51,6 +51,7 @@ export async function PATCH(
       ...(title !== undefined && { title }),
       ...(description !== undefined && { description }),
       ...(status !== undefined && { status }),
+      ...(priority !== undefined && { priority }),
       ...(assignedToUserId !== undefined && { assignedToUserId }),
     },
   });

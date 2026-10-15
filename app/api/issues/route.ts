@@ -8,6 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const issues = await prisma.issue.findMany({
       orderBy: { createdAt: "desc" },
+      include: { assignedToUser: true },
     });
     return NextResponse.json(issues);
   } catch (error) {
@@ -34,6 +35,8 @@ export async function POST(request: NextRequest) {
     data: {
       title: body.title,
       description: body.description,
+      ...(body.priority && { priority: body.priority }),
+      ...(body.status && { status: body.status }),
     },
   });
 

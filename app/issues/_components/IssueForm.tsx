@@ -4,8 +4,8 @@ import ErrorMessage from '@/app/components/ErrorMessage';
 import Spinner from '@/app/components/Spinner';
 import { issueSchema } from '@/app/validationSchemas';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Issue } from '@prisma/client';
-import { Button, Callout, TextField } from '@radix-ui/themes';
+import { Issue, Priority } from '@prisma/client';
+import { Button, Callout, Flex, Select, Text, TextField } from '@radix-ui/themes';
 import axios from 'axios';
 import 'easymde/dist/easymde.min.css';
 import { useRouter } from 'next/navigation';
@@ -26,6 +26,11 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
     formState: { errors },
   } = useForm<IssueFormData>({
     resolver: zodResolver(issueSchema),
+    defaultValues: {
+      title: issue?.title || '',
+      description: issue?.description || '',
+      priority: issue?.priority || 'MEDIUM',
+    },
   });
   const [error, setError] = useState('');
   const [isSubmitting, setSubmitting] = useState(false);
@@ -39,7 +44,7 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
       router.refresh();
     } catch (error) {
       setSubmitting(false);
-      setError('An unexpected error occurred.');
+      setError('An unexpected error occurred. Ensure you are signed in.');
     }
   });
 
@@ -50,22 +55,50 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
           <Callout.Text>{error}</Callout.Text>
         </Callout.Root>
       )}
-      <form className="space-y-3" onSubmit={onSubmit}>
-        <TextField.Root
-          defaultValue={issue?.title}
-          placeholder="Title"
-          {...register('title')}
-        />
-        <ErrorMessage>{errors.title?.message}</ErrorMessage>
-        <Controller
-          name="description"
-          control={control}
-          defaultValue={issue?.description}
-          render={({ field }) => (
-            <SimpleMDE placeholder="Description" {...field} />
-          )}
-        />
-        <ErrorMessage>{errors.description?.message}</ErrorMessage>
+      <form className="space-y-4" onSubmit={onSubmit}>
+        <div>
+          <TextField.Root
+            placeholder="Issue Title"
+            {...register('title')}
+          />
+          <ErrorMessage>{errors.title?.message}</ErrorMessage>
+        </div>
+
+        <Flex align="center" gap="3">
+          <Text size="2" weight="medium">
+            Priority:
+          </Text>
+          <Controller
+            name="priority"
+            control={control}
+            render={({ field }) => (
+              <Select.Root
+                defaultValue={field.value || 'MEDIUM'}
+                onValueChange={(val) => field.onChange(val as Priority)}
+              >
+                <Select.Trigger />
+                <Select.Content>
+                  <Select.Item value="URGENT">🚨 Critical / Urgent</Select.Item>
+                  <Select.Item value="HIGH">High Priority</Select.Item>
+                  <Select.Item value="MEDIUM">Medium Priority</Select.Item>
+                  <Select.Item value="LOW">Low Priority</Select.Item>
+                </Select.Content>
+              </Select.Root>
+            )}
+          />
+        </Flex>
+
+        <div>
+          <Controller
+            name="description"
+            control={control}
+            render={({ field }) => (
+              <SimpleMDE placeholder="Detailed issue description and reproduction steps..." {...field} />
+            )}
+          />
+          <ErrorMessage>{errors.description?.message}</ErrorMessage>
+        </div>
+
         <Button disabled={isSubmitting}>
           {issue ? 'Update Issue' : 'Submit New Issue'}{' '}
           {isSubmitting && <Spinner />}
