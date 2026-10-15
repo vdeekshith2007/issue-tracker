@@ -1,5 +1,6 @@
 import { PrismaClient, Priority, Status } from "@prisma/client";
 import { PrismaMariaDb } from "@prisma/adapter-mariadb";
+import bcrypt from "bcryptjs";
 
 const connectionString =
   process.env.DATABASE_URL ||
@@ -8,45 +9,71 @@ const adapter = new PrismaMariaDb(connectionString);
 const prisma = new PrismaClient({ adapter });
 
 async function main() {
-  console.log("🌱 Seeding realistic Issue Tracker Pro data...");
+  console.log("🌱 Seeding realistic Issue Tracker Pro data & users...");
 
-  // 1. Seed Team Members
+  const defaultHashedPassword = await bcrypt.hash("Password123!", 10);
+  const userHashedPassword = await bcrypt.hash("Deekshith@8077", 10);
+
+  // 1. Seed Main User Account (Deekshith)
+  const mainUser = await prisma.user.upsert({
+    where: { email: "vataparthideekshith18@gmail.com" },
+    update: {
+      hashedPassword: userHashedPassword,
+    },
+    create: {
+      name: "Deekshith Vataparthi",
+      email: "vataparthideekshith18@gmail.com",
+      hashedPassword: userHashedPassword,
+      image: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    },
+  });
+
+  // 2. Seed Team Members
   const user1 = await prisma.user.upsert({
     where: { email: "sarah.chen@issuetracker.pro" },
-    update: {},
+    update: {
+      hashedPassword: defaultHashedPassword,
+    },
     create: {
       name: "Sarah Chen",
       email: "sarah.chen@issuetracker.pro",
+      hashedPassword: defaultHashedPassword,
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150&auto=format&fit=crop&q=80",
     },
   });
 
   const user2 = await prisma.user.upsert({
     where: { email: "alex.rivera@issuetracker.pro" },
-    update: {},
+    update: {
+      hashedPassword: defaultHashedPassword,
+    },
     create: {
       name: "Alex Rivera",
       email: "alex.rivera@issuetracker.pro",
+      hashedPassword: defaultHashedPassword,
       image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop&q=80",
     },
   });
 
   const user3 = await prisma.user.upsert({
     where: { email: "david.kim@issuetracker.pro" },
-    update: {},
+    update: {
+      hashedPassword: defaultHashedPassword,
+    },
     create: {
       name: "David Kim",
       email: "david.kim@issuetracker.pro",
+      hashedPassword: defaultHashedPassword,
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&auto=format&fit=crop&q=80",
     },
   });
 
-  console.log(`Created team members: ${user1.name}, ${user2.name}, ${user3.name}`);
+  console.log(`Created users: ${mainUser.name}, ${user1.name}, ${user2.name}, ${user3.name}`);
 
-  // 2. Clear existing issues to seed fresh practical examples
+  // 3. Clear existing issues to seed fresh practical examples
   await prisma.issue.deleteMany();
 
-  // 3. Realistic Issue Dataset with Critical, High, Medium, and Low items
+  // 4. Realistic Issue Dataset with Critical, High, Medium, and Low items
   const issuesToSeed = [
     {
       title: "🚨 [CRITICAL] Redis Session Store Connection Pool Exhaustion under Peak Traffic",
@@ -66,7 +93,7 @@ Under sudden connection bursts (>2,500 req/sec), the Redis client pool runs out 
 - Scale Redis replica cluster nodes.`,
       status: Status.OPEN,
       priority: Priority.URGENT,
-      assignedToUserId: user1.id,
+      assignedToUserId: mainUser.id,
     },
     {
       title: "🚨 [SECURITY] Rate-Limiting Bypass on Password Reset Endpoint via Header Spoofing",
@@ -120,7 +147,7 @@ Allow workspace administrators and developers to enable 2FA using standard RFC 6
 - Provide 8 single-use emergency backup recovery codes.`,
       status: Status.OPEN,
       priority: Priority.HIGH,
-      assignedToUserId: user2.id,
+      assignedToUserId: mainUser.id,
     },
     {
       title: "🎨 [UI/UX] Implement Dark Mode Theme Switcher with Radix UI Tokens",
@@ -153,7 +180,7 @@ Add a quick-toggle theme switch in the top navigation bar supporting:
     await prisma.issue.create({ data: issue });
   }
 
-  console.log(`✅ Successfully seeded ${issuesToSeed.length} practical issues into MySQL!`);
+  console.log(`✅ Successfully seeded users and ${issuesToSeed.length} practical issues into MySQL!`);
 }
 
 main()

@@ -14,15 +14,21 @@ const providers: NextAuthOptions["providers"] = [
     },
     async authorize(credentials) {
       if (!credentials?.email || !credentials?.password) {
-        throw new Error("Invalid credentials");
+        return null;
       }
 
-      const user = await prisma.user.findUnique({
-        where: { email: credentials.email },
+      const email = credentials.email.trim().toLowerCase();
+
+      const user = await prisma.user.findFirst({
+        where: {
+          email: {
+            equals: email,
+          },
+        },
       });
 
       if (!user || !user.hashedPassword) {
-        throw new Error("User does not exist or password not set");
+        return null;
       }
 
       const isCorrectPassword = await bcrypt.compare(
@@ -31,7 +37,7 @@ const providers: NextAuthOptions["providers"] = [
       );
 
       if (!isCorrectPassword) {
-        throw new Error("Incorrect password");
+        return null;
       }
 
       return user;
@@ -67,6 +73,9 @@ const authOptions: NextAuthOptions = {
       }
       return session;
     },
+  },
+  pages: {
+    signIn: "/auth/signin",
   },
   secret: process.env.NEXTAUTH_SECRET || "issue-tracker-super-secret-key-change-in-prod-32chars",
 };
