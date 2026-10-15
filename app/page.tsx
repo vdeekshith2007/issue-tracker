@@ -2,22 +2,34 @@ import prisma from "@/prisma/client";
 import IssueSummary from "./IssueSummary";
 import LatestIssues from "./LatestIssues";
 import IssueChart from "./IssueChart";
-import { Flex, Grid } from "@radix-ui/themes";
+import { Callout, Flex, Grid } from "@radix-ui/themes";
 import { Metadata } from "next";
 
 export default async function Home() {
-  const open = await prisma.issue.count({
-    where: { status: "OPEN" },
-  });
-  const inProgress = await prisma.issue.count({
-    where: { status: "IN_PROGRESS" },
-  });
-  const closed = await prisma.issue.count({
-    where: { status: "CLOSED" },
-  });
+  let open = 0;
+  let inProgress = 0;
+  let closed = 0;
+  let dbError: string | null = null;
+
+  try {
+    [open, inProgress, closed] = await Promise.all([
+      prisma.issue.count({ where: { status: "OPEN" } }),
+      prisma.issue.count({ where: { status: "IN_PROGRESS" } }),
+      prisma.issue.count({ where: { status: "CLOSED" } }),
+    ]);
+  } catch (err) {
+    console.error("[Dashboard] Database error:", err);
+    dbError =
+      "Could not connect to the database. Check your DATABASE_URL and ensure MySQL is running.";
+  }
 
   return (
     <Grid columns={{ initial: "1", md: "2" }} gap="5">
+      {dbError && (
+        <Callout.Root color="red" className="col-span-2">
+          <Callout.Text>⚠ {dbError}</Callout.Text>
+        </Callout.Root>
+      )}
       <Flex direction="column" gap="5">
         <IssueSummary open={open} inProgress={inProgress} closed={closed} />
         <IssueChart open={open} inProgress={inProgress} closed={closed} />
