@@ -1,11 +1,5 @@
-import React from 'react'
+import { redirect } from "next/navigation";
 
-const IssuePage = () => {
-  return (
-    <div>
-      issuespage message 
-    </div>
-  )
+export default function IssuesRootPage() {
+  redirect("/issues/list");
 }
-
-export default IssuePage

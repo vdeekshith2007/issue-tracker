@@ -1,10 +1,6 @@
-
-// @tailwind base styles update
-
-const config = {
-  plugins: {
-    "@tailwindcss/postcss": {},
-  },
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
 };
 
-module.exports = config;
+module.exports = nextConfig;

@@ -10,8 +10,9 @@ import axios from 'axios';
 import 'easymde/dist/easymde.min.css';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Controller, useForm } from 'react-hook-form';
-import SimpleMDE from 'react-simplemde-editor';
+const SimpleMDE = dynamic(() => import('react-simplemde-editor'), { ssr: false });
 import { z } from 'zod';
 
 type IssueFormData = z.infer<typeof issueSchema>;
@@ -50,13 +51,11 @@ const IssueForm = ({ issue }: { issue?: Issue }) => {
         </Callout.Root>
       )}
       <form className="space-y-3" onSubmit={onSubmit}>
-        <TextField.Root>
-          <TextField.Input
-            defaultValue={issue?.title}
-            placeholder="Title"
-            {...register('title')}
-          />
-        </TextField.Root>
+        <TextField.Root
+          defaultValue={issue?.title}
+          placeholder="Title"
+          {...register('title')}
+        />
         <ErrorMessage>{errors.title?.message}</ErrorMessage>
         <Controller
           name="description"

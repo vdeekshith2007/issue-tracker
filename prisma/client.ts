@@ -1,19 +1,36 @@
-import { PrismaClient } from '@/app/generated/prisma/client'
+import { PrismaClient } from "@prisma/client";
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 
 const prismaClientSingleton = () => {
-  return new PrismaClient()
-}
+  const connectionString = process.env.DATABASE_URL;
 
-type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>
+  if (!connectionString) {
+    throw new Error(
+      "DATABASE_URL is not configured. Please define it in your .env file or hosting provider settings."
+    );
+  }
+
+  const adapter = new PrismaMariaDb(connectionString);
+
+  return new PrismaClient({
+    adapter,
+    log:
+      process.env.NODE_ENV === "development"
+        ? ["query", "error", "warn"]
+        : ["error"],
+  });
+};
+
+type PrismaClientSingleton = ReturnType<typeof prismaClientSingleton>;
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClientSingleton | undefined
+  prisma: PrismaClientSingleton | undefined;
+};
+
+export const prisma = globalForPrisma.prisma ?? prismaClientSingleton();
+
+if (process.env.NODE_ENV !== "production") {
+  globalForPrisma.prisma = prisma;
 }
 
-const prisma = globalForPrisma.prisma ?? prismaClientSingleton()
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = prisma
-}
-
-export default prisma
+export default prisma;

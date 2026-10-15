@@ -1,14 +1,41 @@
-import { validateAndNormalizeCacheLifeProfile } from "next/dist/server/use-cache/cache-life-profile";
-import {NextRequest, NextResponse} from "next/server";
-import {z} from 'zod';
-z.object({
-    title:z.string().min(1).max(255),
-    description:z.string().min(1)
-})
-export async function POST(request:NextRequest){
-     const boby = await request.json();
-    const validation= createIssueSchema.safeparse(body);
-    if (!validation.success)
-        return NextResponse.json(validateAndNormalizeCacheLifeProfile.error.errors,{status:400});
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/prisma/client";
+import { issueSchema } from "@/app/validationSchemas";
+import { getServerSession } from "next-auth";
+import authOptions from "@/app/auth/authOptions";
 
+export async function GET(request: NextRequest) {
+  try {
+    const issues = await prisma.issue.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    return NextResponse.json(issues);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to fetch issues" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions);
+  if (!session) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const body = await request.json();
+  const validation = issueSchema.safeParse(body);
+  if (!validation.success) {
+    return NextResponse.json(validation.error.format(), { status: 400 });
+  }
+
+  const newIssue = await prisma.issue.create({
+    data: {
+      title: body.title,
+      description: body.description,
+    },
+  });
+
+  return NextResponse.json(newIssue, { status: 201 });
 }

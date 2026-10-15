@@ -6,10 +6,15 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({}, { status: 401 });
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await segmentData.params;
+  const issueId = parseInt(id, 10);
+  if (isNaN(issueId))
+    return NextResponse.json({ error: "Invalid issue ID" }, { status: 400 });
 
   const body = await request.json();
   const validation = patchIssueSchema.safeParse(body);
@@ -18,7 +23,7 @@ export async function PATCH(
       status: 400,
     });
 
-  const { assignedToUserId, title, description } = body;
+  const { assignedToUserId, title, description, status } = body;
 
   if (assignedToUserId) {
     const user = await prisma.user.findUnique({
@@ -32,7 +37,7 @@ export async function PATCH(
   }
 
   const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: issueId },
   });
   if (!issue)
     return NextResponse.json(
@@ -43,9 +48,10 @@ export async function PATCH(
   const updatedIssue = await prisma.issue.update({
     where: { id: issue.id },
     data: {
-      title,
-      description,
-      assignedToUserId
+      ...(title !== undefined && { title }),
+      ...(description !== undefined && { description }),
+      ...(status !== undefined && { status }),
+      ...(assignedToUserId !== undefined && { assignedToUserId }),
     },
   });
 
@@ -54,13 +60,18 @@ export async function PATCH(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  segmentData: { params: Promise<{ id: string }> }
 ) {
   const session = await getServerSession(authOptions);
-  if (!session) return NextResponse.json({}, { status: 401 });
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id } = await segmentData.params;
+  const issueId = parseInt(id, 10);
+  if (isNaN(issueId))
+    return NextResponse.json({ error: "Invalid issue ID" }, { status: 400 });
 
   const issue = await prisma.issue.findUnique({
-    where: { id: parseInt(params.id) },
+    where: { id: issueId },
   });
 
   if (!issue)
@@ -73,5 +84,5 @@ export async function DELETE(
     where: { id: issue.id },
   });
 
-  return NextResponse.json({});
+  return NextResponse.json({ success: true });
 }
