@@ -23,7 +23,7 @@ const IssuePriorityFilter = () => {
       onValueChange={(priority) => {
         const params = new URLSearchParams();
         if (searchParams.get("status")) {
-          params.append("status", searchParams.get("status")!);
+          params.append("status", searchParams.get("status")!);  
         }
         if (priority && priority !== "ALL") {
           params.append("priority", priority);
