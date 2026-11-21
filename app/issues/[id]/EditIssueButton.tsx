@@ -9,6 +9,6 @@ const EditIssueButton = ({ issueId }: { issueId: number }) => {
       <Link href={`/issues/edit/${issueId}`}>Edit Issue</Link>  
     </Button>
   );
-};
+};    
 
 export default EditIssueButton;
