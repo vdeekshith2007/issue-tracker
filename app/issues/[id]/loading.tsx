@@ -11,7 +11,7 @@ const LoadingIssueDetailPage = () => {
       </Flex>
       <Card className='prose' mt="4">
         <Skeleton count={3} />
-      </Card>
+      </Card>     
     </Box>
   )
 }
